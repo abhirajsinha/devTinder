@@ -38,7 +38,7 @@ const userSchema = new Schema(
         if (!["male", "female", "others"].includes(value)) {
           throw new Error("Invalid gender");
         }
-      }
+      },
     },
     password: {
       type: String,
