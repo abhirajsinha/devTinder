@@ -1,12 +1,18 @@
+require('dotenv').config();
 const express = require("express");
 const connectToDatabase = require("./config/databases");
 const app = express();
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Connect to database and start server
 connectToDatabase()
   .then(() => {
     console.log("Connected to database");
-    app.listen(3000, () => {
-      console.log("Server is listening on port: " + 3000);
+    app.listen(process.env.PORT || 3000, () => {
+      console.log("Server is listening on port: " + (process.env.PORT || 3000));
     });
   })
   .catch((err) => {

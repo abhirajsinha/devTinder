@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 
 async function connectToDatabase() {
-  await mongoose.connect(
-    "mongodb+srv://abhirajsinha25:asmongodb@cluster0.7dglxng.mongodb.net/socialpedia"
-  );
+  await mongoose.connect(process.env.MONGODB_URL);
 }
 
 module.exports = connectToDatabase;
