@@ -1,3 +1,4 @@
+const validator = require('validator')
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -21,10 +22,11 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email",
-      ],
+      validate(value){
+        if(!validator.isEmail(value)){
+          throw new Error("Invalid Email: " + value)
+        }
+      }
     },
     age: {
       type: Number,
@@ -53,6 +55,11 @@ const userSchema = new Schema(
     photoUrl: {
       type: String,
       trim: true,
+      validate(value){
+        if(!validator.isURL(value)){
+          throw new Error("Please Enter a valid URL: " + value)
+        }
+      }
     },
     skills: {
       type: [String],

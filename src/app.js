@@ -10,14 +10,21 @@ app.use(express.json());
 // POST endpoint for user signup
 app.post("/signup", async (req, res) => {
   try {
-    const { firstName, lastName, email, password, age, gender } = req.body;
+    const { firstName, lastName, email, password, age, gender, photoUrl, skills } = req.body;
 
     // Basic validation
     if (!firstName || !lastName || !email || !password || !age || !gender) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "All fields are required",
       });
+    }
+
+    if(skills.length > 10){
+      res.status(400).json({
+        success:false,
+        message:"You can Add Upto 10 Skills."
+      })
     }
 
     // Create user
@@ -28,6 +35,7 @@ app.post("/signup", async (req, res) => {
       password,
       age,
       gender,
+      photoUrl
     });
 
     // Send success response
@@ -55,11 +63,12 @@ app.post("/signup", async (req, res) => {
     }
 
     // Handle other errors
-    res.status(500).json({
-      success: false,
-      message: "Error creating user",
-      error: error.message,
-    });
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(error.errors).map(e => e.message).join(", "),
+      });
+    }
   }
 });
 
