@@ -3,10 +3,6 @@ const express = require("express");
 const connectToDatabase = require("./config/databases");
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Connect to database and start server
 connectToDatabase()
   .then(() => {
