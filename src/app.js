@@ -14,14 +14,14 @@ app.post("/signup", async (req, res) => {
 
     // Basic validation
     if (!firstName || !lastName || !email || !password || !age || !gender) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
     }
 
     if(skills.length > 10){
-      res.status(400).json({
+      return res.status(400).json({
         success:false,
         message:"You can Add Upto 10 Skills."
       })
