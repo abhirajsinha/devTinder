@@ -1,12 +1,11 @@
 require("dotenv").config();
 const connectToDatabase = require("./config/databases");
 const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const app = express();
 const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validations");
+const { userAuth } = require("./middlewares/auth");
 
 // Middleware
 app.use(express.json());
@@ -99,7 +98,7 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);    
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
@@ -107,8 +106,9 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    const token = await jwt.sign({ _id: user._id }, "SECRET@KEY");
-    res.cookie("token", token);
+    // get JWT Token
+    const token = await user.getJWT();
+    res.cookie("token", token, { expires: new Date(Date.now() + 900000) });
 
     res.status(200).json({
       message: "Login Succesfull",
@@ -123,15 +123,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Profile`
-app.get("/profile", async (req, res) => {
+// Profile
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-    const decodedMessage = await jwt.verify(token, "SECRET@KEY");
-    const { _id } = decodedMessage;
-    const user = await User.findById(_id);    
-    res.send("Reading Cookie");
+    const user = req.user;
+    res.send(user);
   } catch (error) {
     res.status(401).json({
       message: "Invalid Token",
@@ -139,42 +135,11 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-// Delete user endpoint
-app.delete("/delete-user", async (req, res) => {});
-
-// Update user endpoint
-app.patch("/update-user", async (req, res) => {
-  const userId = req.body.userId;
-  const data = req.body;
-
+// Send Connection Req
+app.post("/send-connection", userAuth, async (req, res) => {
   try {
-    // API level validations
-    const ALLOWED_UPDATES = ["userId", "photoUrl", "about", "skills"];
-    const userData = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-
-    if (!userData) {
-      throw new Error("This update is not allowed");
-    }
-
-    // Update User Data
-    const user = await User.findByIdAndUpdate(userId, data, {
-      // validators - [optional]
-      returnDocument: "after",
-      runValidators: true,
-    });
-    res.status(200).json({
-      success: true,
-      message: "User updated successfully",
-      data: user,
-    });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error updating user",
-      error: error.message,
-    });
+    res.status(404).message({});
   }
 });
 

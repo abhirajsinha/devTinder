@@ -6,3 +6,4 @@
 # __v in monngodb
 # json vs js-objects
 # aggregations in mongodb
+# why we are exporting like this here and using require instead of imports in nodeJS
