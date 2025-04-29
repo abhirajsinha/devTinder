@@ -1,6 +1,6 @@
 const express = require("express");
 require("dotenv").config();
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const authRouter = express.Router();
 const { validateSignUpData } = require("../utils/validations");
 const User = require("../models/user");
@@ -115,6 +115,14 @@ authRouter.post("/login", async (req, res) => {
       message: "Invalid Credentials",
     });
   }
+});
+
+// logout endpoint
+authRouter.post("/logout", async (req, res) => {
+  try {
+    res.cookie("token", null, { expires: new Date(Date.now()) });
+    res.send("Logout Successfull");
+  } catch (error) {}
 });
 
 module.exports = authRouter;
