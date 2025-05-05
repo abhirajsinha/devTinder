@@ -125,4 +125,13 @@ authRouter.post("/logout", async (req, res) => {
   } catch (error) {}
 });
 
+// forgot password
+authRouter.post("/forgot-password", async (req, res) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+});
+
 module.exports = authRouter;
