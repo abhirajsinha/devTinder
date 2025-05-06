@@ -20,12 +20,12 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     }
 
     // check if the other user exist or not before sending connection req
-    const isUser = await User.findById(toUserId);
-    if (!isUser) {
+    const toUser = await User.findById(toUserId);
+    if (!toUser) {
       return res.status(400).json({
         message: "User Doesn't exist",
       });
-    }    
+    }
 
     // check if already existing connection between these users
     const isAlreadyConnected = await ConnectionRequest.findOne({
@@ -48,7 +48,10 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     });
 
     return res.status(200).json({
-      message: "Connection Request send successfully",
+      message:
+        status === "interested"
+          ? req.user.firstName + " is intrested in " + toUser.firstName
+          : req.user.firstName + " is not intrested in " + toUser.firstName,
       data: connnectionRequestData,
     });
   } catch (error) {

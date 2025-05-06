@@ -25,7 +25,10 @@ const connectionRequestSchema = new mongoose.Schema(
   }
 );
 
-connectionRequestSchema.pre("save", function () {
+// Compound indexing, because here we will have multiple api calls for the connection request and there we have to use these two fields { fromUserId, toUserId} so in that case it will make complex searches to optimise it we will provide index to both of them, so its called compound indexing
+connectionRequestSchema.Schema({ fromUserId: 1, toUserId: 1 });
+
+connectionRequestSchema.pre("save", function (next) {
   const connectionRequest = this;
   if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
     throw new Error("Cannot send connection request to yourself");
