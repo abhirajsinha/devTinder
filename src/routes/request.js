@@ -1,6 +1,7 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 const requestRouter = express.Router();
 
 // Send Connection Req
@@ -10,9 +11,25 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     const toUserId = req.params.toUserId;
     const status = req.params.status;
 
+    // Can't send connection request to itself
+    if (fromUserId.equals(toUserId)) {
+      return res.status(400).json({
+        message: "Can't send invite to yourself",
+      });
+    }
+
+    // check if the other user exist or not before sending connection req
+    const isUser = await User.findById(toUserId);
+    if (!isUser) {
+      return res.status(400).json({
+        message: "User Doesn't exist",
+      });
+    }
+
+    // check the status type, this api only accepts below status types
     const allowedStatus = ["ignored", "interested"];
     if (!allowedStatus.includes(status)) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Invalid Status Type",
       });
     }
@@ -25,8 +42,8 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       ],
     });
 
-    if(isAlreadyConnected){
-      res.status(400).json({
+    if (isAlreadyConnected) {
+      return res.status(400).json({
         message: "Connection Request already exist",
       });
     }
@@ -37,12 +54,12 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       status,
     });
 
-    res.json({
+    return res.status(200).json({
       message: "Connection Request send successfully",
       data: connnectionRequestData,
     });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       message: error.message,
     });
   }
