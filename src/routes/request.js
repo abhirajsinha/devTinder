@@ -11,10 +11,11 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     const toUserId = req.params.toUserId;
     const status = req.params.status;
 
-    // Can't send connection request to itself
-    if (fromUserId.equals(toUserId)) {
+    // check the status type, this api only accepts below status types
+    const allowedStatus = ["ignored", "interested"];
+    if (!allowedStatus.includes(status)) {
       return res.status(400).json({
-        message: "Can't send invite to yourself",
+        message: "Invalid Status Type",
       });
     }
 
@@ -24,15 +25,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       return res.status(400).json({
         message: "User Doesn't exist",
       });
-    }
-
-    // check the status type, this api only accepts below status types
-    const allowedStatus = ["ignored", "interested"];
-    if (!allowedStatus.includes(status)) {
-      return res.status(400).json({
-        message: "Invalid Status Type",
-      });
-    }
+    }    
 
     // check if already existing connection between these users
     const isAlreadyConnected = await ConnectionRequest.findOne({
