@@ -1,9 +1,11 @@
 const express = require("express");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
-const authRouter = express.Router();
 const { validateSignUpData } = require("../utils/validations");
 const User = require("../models/user");
+
+// Router
+const authRouter = express.Router();
 
 // POST endpoint for user signup
 authRouter.post("/signup", async (req, res) => {

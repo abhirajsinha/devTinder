@@ -4,6 +4,7 @@ const connectionRequestSchema = new mongoose.Schema(
   {
     fromUserId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref:'User',
       required: true,
     },
     toUserId: {
@@ -26,7 +27,7 @@ const connectionRequestSchema = new mongoose.Schema(
 );
 
 // Compound indexing, because here we will have multiple api calls for the connection request and there we have to use these two fields { fromUserId, toUserId} so in that case it will make complex searches to optimise it we will provide index to both of them, so its called compound indexing
-connectionRequestSchema.Schema({ fromUserId: 1, toUserId: 1 });
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 
 connectionRequestSchema.pre("save", function (next) {
   const connectionRequest = this;
