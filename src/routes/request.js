@@ -91,8 +91,8 @@ requestRouter.post(
         });
       }
 
-      ConnectionRequest.status = status;
-      const data = await ConnectionRequest.save();
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
       return res.json({
         message: "Connection Request " + status,
         data,
